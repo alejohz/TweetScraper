@@ -1,5 +1,5 @@
 # !!! # Crawl responsibly by identifying yourself (and your website/e-mail) on the user-agent
-USER_AGENT = 'TweetScraper'
+USER_AGENT = 'Human-Agent'
 
 # settings for spiders
 BOT_NAME = 'TweetScraper'
@@ -16,6 +16,7 @@ SAVE_TWEET_PATH = './Data/tweet/'
 SAVE_USER_PATH = './Data/user/'
 
 DOWNLOAD_DELAY = 1.0
+CLOSESPIDER_ITEMCOUNT = 2000
 
 # settings for selenium
 from shutil import which
