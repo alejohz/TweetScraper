@@ -48,19 +48,21 @@ class TweetScraper(CrawlSpider):
             f'&count=20'
             f'&tweet_search_mode=live'
         )
+        # query =  f"'Viva Envigado'"
+        # query = "ukraine war lang:en"
+        query = "rappi near:mx lang:es"
         self.url = self.url + '&q={query}'
         self.query = query
         self.num_search_issued = 0
         # regex for finding next cursor
         self.cursor_re = re.compile('"(scroll:[^"]*)"')
 
-
     def start_requests(self):
         """
         Use the landing page to get cookies first
         """
-        yield SeleniumRequest(url="https://twitter.com/explore", callback=self.parse_home_page)
-
+        yield SeleniumRequest(url="https://twitter.com/explore",
+                              callback=self.parse_home_page)
 
     def parse_home_page(self, response):
         """
@@ -70,7 +72,6 @@ class TweetScraper(CrawlSpider):
         self.update_cookies(response)
         for r in self.start_query_request():
             yield r
-
 
     def update_cookies(self, response):
         driver = response.meta['driver']
@@ -82,15 +83,13 @@ class TweetScraper(CrawlSpider):
             logger.info('cookies are not updated!')
 
         self.headers = {
-            'authorization': 'Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA',
+            'authorization': 'Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA',  # noqa: E501
             'x-guest-token': self.x_guest_token,
             # 'x-csrf-token': self.x_csrf_token,
         }
         print('headers:\n--------------------------\n')
         print(self.headers)
         print('\n--------------------------\n')
-
-
 
     def start_query_request(self, cursor=None):
         """
@@ -101,19 +100,22 @@ class TweetScraper(CrawlSpider):
             url = url.format(query=quote(self.query), cursor=quote(cursor))
         else:
             url = self.url.format(query=quote(self.query))
-        request = http.Request(url, callback=self.parse_result_page, cookies=self.cookies, headers=self.headers)
+        request = http.Request(url, callback=self.parse_result_page,
+                               cookies=self.cookies,
+                               headers=self.headers)
         yield request
 
         self.num_search_issued += 1
         if self.num_search_issued % 100 == 0:
-            # get new SeleniumMiddleware            
+            # get new SeleniumMiddleware
             for m in self.crawler.engine.downloader.middleware.middlewares:
                 if isinstance(m, SeleniumMiddleware):
                     m.spider_closed()
-            self.crawler.engine.downloader.middleware = DownloaderMiddlewareManager.from_crawler(self.crawler)
+            self.crawler.engine.downloader.middleware = DownloaderMiddlewareManager.from_crawler(self.crawler)  # noqa: E501
             # update cookies
-            yield SeleniumRequest(url="https://twitter.com/explore", callback=self.update_cookies, dont_filter=True)
-
+            yield SeleniumRequest(url="https://twitter.com/explore",
+                                  callback=self.update_cookies,
+                                  dont_filter=True)
 
     def parse_result_page(self, response):
         """
@@ -125,26 +127,24 @@ class TweetScraper(CrawlSpider):
         data = json.loads(response.text)
         for item in self.parse_tweet_item(data['globalObjects']['tweets']):
             yield item
-        for item in self.parse_user_item(data['globalObjects']['users']):
-            yield item
+        # for item in self.parse_user_item(data['globalObjects']['users']):
+            # yield item
 
         # get next page
         cursor = self.cursor_re.search(response.text).group(1)
         for r in self.start_query_request(cursor=cursor):
             yield r
 
-
     def parse_tweet_item(self, items):
-        for k,v in items.items():
+        for k, v in items.items():
             # assert k == v['id_str'], (k,v)
             tweet = Tweet()
             tweet['id_'] = k
             tweet['raw_data'] = v
             yield tweet
 
-
     def parse_user_item(self, items):
-        for k,v in items.items():
+        for k, v in items.items():
             # assert k == v['id_str'], (k,v)
             user = User()
             user['id_'] = k

@@ -15,8 +15,8 @@ ITEM_PIPELINES = {
 SAVE_TWEET_PATH = './Data/tweet/'
 SAVE_USER_PATH = './Data/user/'
 
-DOWNLOAD_DELAY = 1.0
-CLOSESPIDER_ITEMCOUNT = 2000
+DOWNLOAD_DELAY = 1.5
+# CLOSESPIDER_ITEMCOUNT = 10000
 
 # settings for selenium
 from shutil import which
