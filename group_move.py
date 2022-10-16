@@ -9,8 +9,8 @@ parser.add_argument("path_to_save")
 args = parser.parse_args()
 
 p = Path('.')
-tweets = [file for file in (p / 'Data' / 'tweet').rglob('*') if file.is_file()]
-# users = [file for file in (p / 'Data' / 'user').rglob('*') if file.is_file()]
+tweets = [file for file in (p / 'data' / 'tweet').rglob('*') if file.is_file()]
+# users = [file for file in (p / 'data' / 'user').rglob('*') if file.is_file()]
 
 
 def merge_group(file_list: List, file_name: str):
@@ -19,12 +19,12 @@ def merge_group(file_list: List, file_name: str):
         with open(f, 'r') as in_file:
             data.append(json.load(in_file))
 
-    with open(p / 'Output' / file_name, 'a') as outfile:
+    with open(p / 'output' / file_name, 'a') as outfile:
         json.dump(data, outfile)
 
 
 merge_group(tweets, "rappi_tweets.json")
 # merge_group(users, f"Viva_Env_users_merged.json")
 
-shutil.rmtree(p / 'Data' / 'tweet')
-shutil.rmtree(p / 'Data' / 'user')
+shutil.rmtree(p / 'data' / 'tweet')
+shutil.rmtree(p / 'data' / 'user')

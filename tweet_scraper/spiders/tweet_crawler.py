@@ -1,23 +1,28 @@
-import re, json, logging
+import json
+import logging
+import re
 from urllib.parse import quote
 
 from scrapy import http
-from scrapy.spiders import CrawlSpider
-from scrapy.shell import inspect_response
 from scrapy.core.downloader.middleware import DownloaderMiddlewareManager
+from scrapy.spiders import CrawlSpider
 from scrapy_selenium import SeleniumRequest, SeleniumMiddleware
 
-from TweetScraper.items import Tweet, User
-
+from tweet_scraper.items import Tweet, User
 
 logger = logging.getLogger(__name__)
 
 
+# noinspection PyAbstractClass
 class TweetScraper(CrawlSpider):
-    name = 'TweetScraper'
+    name = 'tweet_scraper'
     allowed_domains = ['twitter.com']
 
     def __init__(self, query=''):
+        super().__init__()
+        self.headers = None
+        self.x_guest_token = None
+        self.cookies = None
         self.url = (
             f'https://api.twitter.com/2/search/adaptive.json?'
             f'include_profile_interstitial_type=1'
@@ -48,9 +53,9 @@ class TweetScraper(CrawlSpider):
             f'&count=20'
             f'&tweet_search_mode=live'
         )
-        # query =  f"'Viva Envigado'"
-        # query = "ukraine war lang:en"
-        query = "rappi near:mx lang:es"
+        # query = f"'Viva Envigado'"
+        query = "ukraine war lang:en"
+        # query = "rappi near:mx lang:es"
         self.url = self.url + '&q={query}'
         self.query = query
         self.num_search_issued = 0
@@ -74,6 +79,7 @@ class TweetScraper(CrawlSpider):
             yield r
 
     def update_cookies(self, response):
+        logger.info(response)
         driver = response.meta['driver']
         try:
             self.cookies = driver.get_cookies()
@@ -135,7 +141,8 @@ class TweetScraper(CrawlSpider):
         for r in self.start_query_request(cursor=cursor):
             yield r
 
-    def parse_tweet_item(self, items):
+    @staticmethod
+    def parse_tweet_item(items):
         for k, v in items.items():
             # assert k == v['id_str'], (k,v)
             tweet = Tweet()
@@ -143,7 +150,8 @@ class TweetScraper(CrawlSpider):
             tweet['raw_data'] = v
             yield tweet
 
-    def parse_user_item(self, items):
+    @staticmethod
+    def parse_user_item(items):
         for k, v in items.items():
             # assert k == v['id_str'], (k,v)
             user = User()
