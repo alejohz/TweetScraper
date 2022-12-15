@@ -15,11 +15,15 @@ COPY requirements.txt ./requirements.txt
 RUN pip install --default-timeout=100 -r requirements.txt
 
 COPY . app/
-WORKDIR app
+WORKDIR /app
 
 ARG ACCESS_KEY_ID
 ARG SECRET_ACCESS_KEY
+ARG SAVE_TWEET_PATH
+ARG SAVE_USER_PATH
 ENV ACCESS_KEY_ID ${ACCESS_KEY_ID}
 ENV SECRET_ACCESS_KEY ${SECRET_ACCESS_KEY}
+ENV SAVE_USER_PATH ${SAVE_USER_PATH}
+ENV SAVE_TWEET_PATH ${SAVE_TWEET_PATH}
 
 CMD scrapy crawl tweet_scraper

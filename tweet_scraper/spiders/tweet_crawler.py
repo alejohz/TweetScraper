@@ -1,3 +1,4 @@
+import os
 import json
 import logging
 import re
@@ -53,9 +54,7 @@ class TweetScraper(CrawlSpider):
             f'&count=20'
             f'&tweet_search_mode=live'
         )
-        # query = f"'Viva Envigado'"
-        query = "ukraine war lang:en"
-        # query = "rappi near:mx lang:es"
+        query = os.getenv('query')
         self.url = self.url + '&q={query}'
         self.query = query
         self.num_search_issued = 0

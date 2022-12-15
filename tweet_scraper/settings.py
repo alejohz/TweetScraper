@@ -16,11 +16,12 @@ ITEM_PIPELINES = {
 }
 
 # settings for where to save data on disk
-SAVE_TWEET_PATH = 's3://ukraine-war/tweet/'
-SAVE_USER_PATH = 's3://ukraine-war/user/'
+SAVE_TWEET_PATH = os.getenv('SAVE_TWEET_PATH')
+SAVE_USER_PATH = os.getenv('SAVE_USER_PATH')
 
 DOWNLOAD_DELAY = 1.5
 # CLOSESPIDER_ITEMCOUNT = 10000
+REQUEST_FINGERPRINTER_IMPLEMENTATION = '2.7'
 
 # settings for selenium
 SELENIUM_DRIVER_NAME = 'firefox'
