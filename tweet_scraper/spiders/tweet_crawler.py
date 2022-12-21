@@ -54,7 +54,7 @@ class TweetScraper(CrawlSpider):
             f'&count=20'
             f'&tweet_search_mode=live'
         )
-        query = os.getenv('query')
+        query = str(os.getenv('query'))
         self.url = self.url + '&q={query}'
         self.query = query
         self.num_search_issued = 0
