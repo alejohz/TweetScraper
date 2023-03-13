@@ -54,8 +54,8 @@ class TweetScraper(CrawlSpider):
             f'&count=20'
             f'&tweet_search_mode=live'
         )
-        query = str(os.getenv('query'))
-        self.url = self.url + '&q={query}'
+        query = os.getenv('QUERY', query)
+        self.url = self.url + f'&q={query}'
         self.query = query
         self.num_search_issued = 0
         # regex for finding next cursor
@@ -101,7 +101,7 @@ class TweetScraper(CrawlSpider):
         Generate the search request
         """
         if cursor:
-            url = self.url + '&cursor={cursor}'
+            url = self.url + f'&cursor={cursor}'
             url = url.format(query=quote(self.query), cursor=quote(cursor))
         else:
             url = self.url.format(query=quote(self.query))
@@ -132,8 +132,8 @@ class TweetScraper(CrawlSpider):
         data = json.loads(response.text)
         for item in self.parse_tweet_item(data['globalObjects']['tweets']):
             yield item
-        # for item in self.parse_user_item(data['globalObjects']['users']):
-            # yield item
+        for item in self.parse_user_item(data['globalObjects']['users']):
+            yield item
 
         # get next page
         cursor = self.cursor_re.search(response.text).group(1)
